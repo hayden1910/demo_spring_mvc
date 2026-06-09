@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mvc.dao.IInvoiceLineDao">
+
+	<resultMap id="InvoiceLineResultMap"
+		type="com.example.mvc.dataitem.InvoiceLineItem">
+		<id property="invoiceLineId" column="InvoiceLineId" />
+		<result property="invoiceId" column="InvoiceId" />
+		<result property="trackId" column="TrackId" />
+		<result property="unitPrice" column="UnitPrice" />
+		<result property="quantity" column="Quantity" />
+	</resultMap>
+
+	<sql id="InvoiceLineColumns">InvoiceLineId, InvoiceId, TrackId, UnitPrice,
+		Quantity</sql>
+
+	<select id="countInvoiceLineItems">
+		SELECT COUNT(*) FROM InvoiceLine
+	</select>
+
+	<select id="selectInvoiceLineList"> SELECT <include
+			refid="InvoiceLineColumns" /> FROM InvoiceLine ORDER BY
+		InvoiceLineId OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY </select>
+
+	<select id="selectInvoiceLineById" resultMap="InvoiceLineResultMap"> SELECT <include
+			refid="InvoiceLineColumns" /> FROM InvoiceLine WHERE InvoiceLineId =
+		#{invoiceLineId} </select>
+
+	<insert id="insertInvoiceLine" useGeneratedKeys="true"
+		keyProperty="invoiceLineId">
+		INSERT INTO InvoiceLine (InvoiceId, TrackId, UnitPrice, Quantity)
+		VALUES (#{invoiceId}, #{trackId}, #{unitPrice}, #{quantity})
+	</insert>
+
+	<update id="updateInvoiceLine">
+		UPDATE InvoiceLine
+		SET InvoiceId = #{invoiceLine.invoiceId},
+		TrackId = #{invoiceLine.trackId},
+		UnitPrice = #{invoiceLine.unitPrice},
+		Quantity = #{invoiceLine.quantity}
+		WHERE InvoiceLineId = #{invoiceLineId}
+	</update>
+
+	<delete id="deleteInvoiceLine">
+		DELETE FROM InvoiceLine WHERE InvoiceLineId = #{invoiceLineId}
+	</delete>
+
+</mapper>

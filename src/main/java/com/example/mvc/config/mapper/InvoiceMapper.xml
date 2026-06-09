@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mvc.dao.IInvoiceDao">
+	<resultMap id="InvoiceResultMap" type="com.example.mvc.dataitem.InvoiceItem">
+		<id property="invoiceId" column="InvoiceId" />
+		<result property="customerId" column="CustomerId" />
+		<result property="invoiceDate" column="InvoiceDate" />
+		<result property="billingAddress" column="BillingAddress" />
+		<result property="billingCity" column="BillingCity" />
+		<result property="billingState" column="BillingState" />
+		<result property="billingCountry" column="BillingCountry" />
+		<result property="billingPostalCode" column="BillingPostalCode" />
+		<result property="total" column="Total" />
+	</resultMap>
+
+	<select id="countInvoiceItems" resultType="long">
+		SELECT COUNT(*) FROM Invoice
+	</select>
+
+	<sql id="InvoiceColumns">
+		InvoiceId, CustomerId, InvoiceDate, BillingAddress, BillingCity,
+		BillingState, BillingCountry, BillingPostalCode, Total
+	</sql>
+
+	<select id="selectInvoiceList" resultMap="InvoiceResultMap"> SELECT <include
+			refid="InvoiceColumns" /> FROM Invoice ORDER BY InvoiceId OFFSET
+		#{offset} ROWS FETCH NEXT #{limit} ROWS ONLY </select>
+
+	<select id="selectInvoiceById" resultMap="InvoiceResultMap"> SELECT <include
+			refid="InvoiceColumns" /> FROM Invoice WHERE InvoiceId =
+		#{invoiceId} </select>
+
+	<insert id="insertInvoice" useGeneratedKeys="true" keyProperty="invoiceId">
+		INSERT INTO Invoice (CustomerId, InvoiceDate, BillingAddress,
+		BillingCity,
+		BillingState, BillingCountry, BillingPostalCode, Total)
+		VALUES (#{customerId}, #{invoiceDate}, #{billingAddress},
+		#{billingCity}, #{billingState}, #{billingCountry},
+		#{billingPostalCode}, #{total})
+	</insert>
+
+	<update id="updateInvoice">
+		UPDATE Invoice
+		SET CustomerId = #{invoice.customerId},
+		InvoiceDate = #{invoice.invoiceDate},
+		BillingAddress = #{invoice.billingAddress},
+		BillingCity = #{invoice.billingCity},
+		BillingState = #{invoice.billingState},
+		BillingCountry = #{invoice.billingCountry},
+		BillingPostalCode = #{invoice.billingPostalCode},
+		Total = #{invoice.total}
+		WHERE InvoiceId = #{invoiceId}
+	</update>
+
+	<delete id="deleteInvoice">
+		DELETE FROM Invoice WHERE InvoiceId = #{invoiceId}
+	</delete>
+</mapper>

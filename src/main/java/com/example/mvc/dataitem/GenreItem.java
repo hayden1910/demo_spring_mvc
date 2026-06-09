@@ -17,5 +17,4 @@ public class GenreItem {
 		this.name = name;
 	}
     
-    
 }
