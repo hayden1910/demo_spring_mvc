@@ -32,6 +32,26 @@
 		VALUES (#{invoiceId}, #{trackId}, #{unitPrice}, #{quantity})
 	</insert>
 
+	<insert id="insertInvoiceLineWithProc" statementType="CALLABLE">
+		{call sp_InsertInvoiceLine(
+			#{invoiceId, mode=IN, jdbcType=INTEGER},
+			#{trackId, mode=IN, jdbcType=INTEGER},
+			#{unitPrice, mode=IN, jdbcType=NUMERIC},
+			#{quantity, mode=IN, jdbcType=INTEGER}
+		)}
+	</insert>
+
+	<select id="selectInvoiceLinesByInvoiceId" resultMap="InvoiceLineResultMap">
+		SELECT <include refid="InvoiceLineColumns" />
+		FROM InvoiceLine
+		WHERE InvoiceId = #{invoiceId}
+		ORDER BY InvoiceLineId
+	</select>
+
+	<select id="calculateLineAmount" resultType="java.math.BigDecimal">
+		SELECT dbo.fn_CalculateLineAmount(#{price}, #{qty})
+	</select>
+
 	<update id="updateInvoiceLine">
 		UPDATE InvoiceLine
 		SET InvoiceId = #{invoiceLine.invoiceId},

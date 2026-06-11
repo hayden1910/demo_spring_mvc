@@ -1,5 +1,6 @@
 package com.example.mvc.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -30,8 +31,16 @@ public class InvoiceLineService {
 		return item;
 	}
 
+	public List<InvoiceLineItem> selectInvoiceLinesByInvoiceId(Long invoiceId) {
+		return dao.selectInvoiceLinesByInvoiceId(invoiceId);
+	}
+
 	public void insertInvoiceLine(InvoiceLineItem item) {
 		dao.insertInvoiceLine(item);
+	}
+
+	public void insertInvoiceLineWithProc(InvoiceLineItem item) {
+		dao.insertInvoiceLineWithProc(item);
 	}
 
 	public void updateInvoiceLine(Long id, InvoiceLineItem item) {
@@ -44,6 +53,10 @@ public class InvoiceLineService {
 		InvoiceLineItem existing = dao.selectInvoiceLineById(id);
 		isExist(id, existing);
 		dao.deleteInvoiceLine(id);
+	}
+
+	public BigDecimal calculateLineAmount(BigDecimal price, int qty) {
+		return dao.calculateLineAmount(price, qty);
 	}
 
 	private void isExist(Long id, InvoiceLineItem item) {

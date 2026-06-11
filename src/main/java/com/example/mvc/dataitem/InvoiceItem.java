@@ -13,7 +13,7 @@ public class InvoiceItem {
 	private String billingCountry;
 	private String billingPostalCode;
 	private BigDecimal total;
-	private List<InvoiceItem> lines;
+	private List<InvoiceLineItem> lines;
 
 	public Long getInvoiceId() {
 		return invoiceId;
@@ -87,11 +87,11 @@ public class InvoiceItem {
 		this.total = total;
 	}
 
-	public List<InvoiceItem> getLines() {
+	public List<InvoiceLineItem> getLines() {
 		return lines;
 	}
 
-	public void setLines(List<InvoiceItem> lines) {
+	public void setLines(List<InvoiceLineItem> lines) {
 		this.lines = lines;
 	}
 

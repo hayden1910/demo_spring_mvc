@@ -13,6 +13,16 @@
 		<result property="total" column="Total" />
 	</resultMap>
 
+	<resultMap id="InvoiceWithLinesResultMap" type="com.example.mvc.dataitem.InvoiceItem" extends="InvoiceResultMap">
+		<collection property="lines" ofType="com.example.mvc.dataitem.InvoiceLineItem">
+			<id property="invoiceLineId" column="InvoiceLineId" />
+			<result property="invoiceId" column="InvoiceId" />
+			<result property="trackId" column="TrackId" />
+			<result property="unitPrice" column="UnitPrice" />
+			<result property="quantity" column="Quantity" />
+		</collection>
+	</resultMap>
+
 	<select id="countInvoiceItems" resultType="long">
 		SELECT COUNT(*) FROM Invoice
 	</select>
@@ -29,6 +39,21 @@
 	<select id="selectInvoiceById" resultMap="InvoiceResultMap"> SELECT <include
 			refid="InvoiceColumns" /> FROM Invoice WHERE InvoiceId =
 		#{invoiceId} </select>
+
+	<select id="selectInvoiceByIdWithLines" resultMap="InvoiceWithLinesResultMap">
+		SELECT i.InvoiceId, i.CustomerId, i.InvoiceDate,
+		i.BillingAddress, i.BillingCity, i.BillingState, i.BillingCountry,
+		i.BillingPostalCode, i.Total,
+		il.InvoiceLineId, il.TrackId, il.UnitPrice, il.Quantity
+		FROM Invoice i
+		LEFT JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+		WHERE i.InvoiceId = #{invoiceId}
+		ORDER BY il.InvoiceLineId
+	</select>
+
+	<select id="calculateLineAmount" resultType="java.math.BigDecimal">
+		SELECT dbo.fn_CalculateLineAmount(#{price}, #{qty})
+	</select>
 
 	<insert id="insertInvoice" useGeneratedKeys="true" keyProperty="invoiceId">
 		INSERT INTO Invoice (CustomerId, InvoiceDate, BillingAddress,

@@ -1,5 +1,6 @@
 package com.example.mvc.dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -16,10 +17,14 @@ public interface IInvoiceDao {
 
 	InvoiceItem selectInvoiceById(@Param("invoiceId") Long id);
 
+	InvoiceItem selectInvoiceByIdWithLines(@Param("invoiceId") Long id);
+
 	void insertInvoice(InvoiceItem invoice);
 
 	void updateInvoice(@Param("invoiceId") Long id, @Param("invoice") InvoiceItem invoice);
 
 	void deleteInvoice(@Param("invoiceId") Long id);
+
+	BigDecimal calculateLineAmount(@Param("price") BigDecimal price, @Param("qty") int qty);
 
 }
