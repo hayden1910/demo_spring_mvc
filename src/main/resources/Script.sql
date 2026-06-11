@@ -1,26 +1,27 @@
 --CREATE DATABASE TEST_PROBA
 
 CREATE TABLE Invoice(
-InvoiceId Int NOT NULL PRIMARY KEY IDENTITY,
-CustomerId Int, 
-InvoiceDate Nvarchar(120),
-BillingAddress Nvarchar(120),
-BillingCity Nvarchar(120),
-BillingState Nvarchar(120),
-BillingCountry Nvarchar(120),
-BillingPostalcode Nvarchar(120),
-Total NUMERIC(18, 2)
+	InvoiceId Int NOT NULL PRIMARY KEY IDENTITY,
+	CustomerId Int, 
+	InvoiceDate Nvarchar(120),
+	BillingAddress Nvarchar(120),
+	BillingCity Nvarchar(120),
+	BillingState Nvarchar(120),
+	BillingCountry Nvarchar(120),
+	BillingPostalcode Nvarchar(120),
+	Total NUMERIC(18, 2)
 )
 
 CREATE TABLE InvoiceLine(
-InvoiceLineId Int NOT NULL PRIMARY KEY IDENTITY,
-InvoiceId Int,
-TrackId Int,
-UnitPrice Numeric(18,2),
-Quantity Int,
-FOREIGN KEY (InvoiceId) REFERENCES Invoice(InvoiceId)
+	InvoiceLineId Int NOT NULL PRIMARY KEY IDENTITY,
+	InvoiceId Int,
+	TrackId Int,
+	UnitPrice Numeric(18,2),
+	Quantity Int,
+	FOREIGN KEY (InvoiceId) REFERENCES Invoice(InvoiceId)
 )
 
+DROP TABLE IF EXISTS Invoice_Audit_Log
 CREATE TABLE Invoice_Audit_Log (
     LogId INT IDENTITY(1,1) PRIMARY KEY,
     InvoiceId INT NOT NULL,
@@ -31,6 +32,12 @@ CREATE TABLE Invoice_Audit_Log (
     ChangedDate DATETIME DEFAULT GETDATE()
 );
 
+
+ALTER TABLE Invoice_Audit_Log
+DROP CONSTRAINT DF__Invoice_A__Chang__73BA3083;
+
+ALTER TABLE Invoice_Audit_Log
+DROP COLUMN ChangedBy 
 
 -- INDEX
 CREATE INDEX IX_InvoiceLine_InvoiceId ON InvoiceLine(InvoiceId);
@@ -64,6 +71,25 @@ BEGIN
     SET Total = ISNULL(Total, 0) + @LineAmount 
     WHERE InvoiceId = @InvId;
 END;
+-----
+
+CREATE TRIGGER trg_AfterInsertMultiInvoiceLine
+ON InvoiceLine
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    UPDATE i
+    SET i.Total = ISNULL(i.Total, 0) + src.TotalLineAmount
+    FROM Invoice i
+    INNER JOIN (
+        SELECT InvoiceId, 
+               SUM(dbo.fn_CalculateLineAmount(UnitPrice * Quantity)) AS TotalLineAmount
+        FROM inserted
+        GROUP BY InvoiceId
+    ) src ON i.InvoiceId = src.InvoiceId;
+END
 
 -----
 CREATE TRIGGER trg_AfterInvoiceUpdate
